@@ -44,6 +44,14 @@ Add the following to the `urlpatterns` in your `urls.py` to expose the webhook e
 
 Then tell Stripe about the webhook (Stripe webhook docs can be found `here <https://stripe.com/docs/webhooks>`_) using the full URL of your endpoint from the urls.py step above (e.g. ``https://example.com/stripe/webhook``).
 
+By default, Customers are linked to `settings.AUTH_USER_MODEL`.
+If you want to link Customers to another model, you must add the following line in settings:
+
+.. code-block:: python
+
+	# For example if you want to use Organization model as subscriber
+	DJSTRIPE_SUBSCRIBER_MODEL = 'accounts.Organization'
+
 Run the commands::
 
     python manage.py migrate
