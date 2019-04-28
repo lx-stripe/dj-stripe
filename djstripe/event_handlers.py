@@ -104,7 +104,8 @@ def customer_subscription_webhook_handler(event):
 
 
 @webhooks.handler(
-	"transfer", "charge", "coupon", "invoice", "invoiceitem", "plan", "product", "source"
+	"transfer", "charge", "coupon", "invoice", "invoiceitem", "plan", "product", "source",
+	"payment_method"
 )
 def other_object_webhook_handler(event):
 	"""Handle updates to transfer, charge, invoice, invoiceitem, plan, product and source objects.
@@ -133,6 +134,7 @@ def other_object_webhook_handler(event):
 			"product": models.Product,
 			"transfer": models.Transfer,
 			"source": models.Source,
+			"payment_method": models.PaymentMethod
 		}.get(event.category)
 
 	_handle_crud_like_event(target_cls=target_cls, event=event)

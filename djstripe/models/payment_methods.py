@@ -70,7 +70,7 @@ class DjstripePaymentMethod(models.Model):
 
 
 # Alias (Deprecated, remove in 2.1.0)
-PaymentMethod = DjstripePaymentMethod
+# PaymentMethod = DjstripePaymentMethod
 
 
 class BankAccount(StripeModel):
@@ -459,3 +459,43 @@ class Source(StripeModel):
 			# https://github.com/stripe/stripe-python/issues/376
 			self.sync_from_stripe_data(self.api_retrieve())
 			return False
+
+
+class PaymentMethod(StripeModel):
+	"""
+	Stripe documentation: https://stripe.com/docs/api/payment_methods
+	"""
+
+	billing_details = JSONField(
+		help_text=(
+			"Billing information associated with the PaymentMethod that may be used or "
+			"required by particular types of payment methods."
+		)
+	)
+
+	card = JSONField(
+		help_text=(
+			"If this is a card PaymentMethod, this hash contains details about the card."
+		)
+	)
+
+	card_present = JSONField(
+		help_text=(
+			"If this is an card_present PaymentMethod, this hash contains details about "
+			"the Card Present payment method."
+		)
+	)
+
+	customer = models.ForeignKey(
+		"Customer", on_delete=models.SET_NULL, null=True, blank=True, related_name="payment_methods"
+	)
+
+	stripe_class = stripe.PaymentMethod
+
+	@classmethod
+	def attach(self, payment_method_id, stripe_customer, api_key=djstripe_settings.STRIPE_SECRET_KEY):
+		stripe.api_key = api_key  # Not sure of this line
+		stripe_payment_method = self.stripe_class.attach(payment_method_id, customer=stripe_customer.id)
+		return self._create_from_stripe_object(stripe_payment_method)
+
+

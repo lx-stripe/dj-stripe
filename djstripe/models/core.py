@@ -772,6 +772,12 @@ class Customer(StripeModel):
 
 		return new_payment_method.resolve()
 
+	def add_payment_method(self, payment_method):
+		from djstripe.models import PaymentMethod
+
+		stripe_customer = self.api_retrieve()
+		PaymentMethod.attach(payment_method, stripe_customer)
+
 	def purge(self):
 		try:
 			self._api_delete()
