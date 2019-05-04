@@ -190,6 +190,19 @@ class ChargeAdmin(StripeModelAdmin):
 	list_filter = ("status", "paid", "refunded", "captured")
 	raw_id_fields = ("customer", "dispute", "invoice", "source", "transfer")
 
+@admin.register(models.PaymentIntent)
+class PaymentIntent(StripeModelAdmin):
+	list_display = (
+		"id",
+		"customer",
+		"amount",
+		"currency",
+		"description",
+		"amount_capturable",
+		"amount_received",
+		"receipt_email",
+	)
+	search_fields = ("customer__id", "invoice__id")
 
 @admin.register(models.Coupon)
 class CouponAdmin(StripeModelAdmin):

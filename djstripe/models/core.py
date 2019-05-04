@@ -352,6 +352,157 @@ class Charge(StripeModel):
 		cls._stripe_object_to_refunds(target_cls=Refund, data=data, charge=self)
 
 
+class PaymentIntent(StripeModel):
+	amount = StripeQuantumCurrencyAmountField(
+		help_text=(
+			"Amount intended to be collected by this PaymentIntent."
+		)
+	)
+	amount_capturable = StripeQuantumCurrencyAmountField(
+		help_text=(
+			"Amount that can be captured from this PaymentIntent."
+		)
+	)
+	amount_received = StripeQuantumCurrencyAmountField(
+		help_text=(
+			"Amount that was collected by this PaymentIntent."
+		)
+	)
+	# application
+	# application_fee_amount
+	canceled_at = models.DateTimeField(
+		null=True,
+		default=None,
+		help_text=(
+			"Populated when status is canceled, this is the time at which the PaymentIntent was "
+			"canceled. Measured in seconds since the Unix epoch."
+		)
+	)
+	cancellation_reason = models.CharField(
+		max_length=255,
+		null=True,
+		help_text=(
+			"User-given reason for cancellation of this PaymentIntent, one of duplicate, "
+			"fraudulent, requested_by_customer, or failed_invoice."
+		)
+	)
+	capture_method = models.CharField(
+		max_length=255,
+		help_text=(
+			"Capture method of this PaymentIntent, one of automatic or manual."
+		)
+	)
+	client_secret = models.CharField(
+		max_length=255,
+		help_text=(
+			"The client secret of this PaymentIntent. Used for client-side retrieval using a "
+			"publishable key. Please refer to our automatic confirmation quickstart guide to "
+			"learn about how client_secret should be handled."
+		)
+	)
+	confirmation_method = models.CharField(
+		max_length=255,
+		help_text=(
+			"Confirmation method of this PaymentIntent, one of manual or automatic."
+		)
+	)
+	currency = StripeCurrencyCodeField()
+	customer = models.ForeignKey(
+		"Customer",
+		null=True,
+		on_delete=models.SET_NULL,
+		help_text=(
+			"ID of the Customer this PaymentIntent is for if one exists."
+		)
+	)
+	description = models.TextField(
+		default='',
+		help_text=(
+			"An arbitrary string attached to the object. Often useful for displaying to users."
+		)
+	)
+	invoice = models.ForeignKey(
+		"Invoice",
+		on_delete=models.SET_NULL,
+		null=True,
+		help_text=(
+			"ID of the invoice that created this PaymentIntent, if it exists."
+		)
+	)
+	last_payment_error = JSONField(
+		help_text=(
+			"The payment error encountered in the previous PaymentIntent confirmation."
+		)
+	)
+	next_action = JSONField(
+		help_text=(
+			"If present, this property tells you what actions you need to take in order for your "
+			"customer to fulfill a payment using the provided source."
+		)
+	)
+	on_behalf_of = models.CharField(
+		max_length=255,
+		help_text=(
+			"The account (if any) for which the funds of the PaymentIntent are intended. "
+			"See the PaymentIntents Connect usage guide for details."
+		)
+	)
+	payment_method = models.ForeignKey(
+		"PaymentMethod",
+		on_delete=models.SET_NULL,
+		null=True,
+		help_text=(
+			"ID of the payment method used in this PaymentIntent."
+		)
+	)
+	payment_method_types = JSONField(
+		help_text=(
+			"The list of payment method types (e.g. card) that this PaymentIntent is allowed to "
+			"use."
+		)
+	)
+	receipt_email = models.CharField(
+		max_length=255,
+		help_text=(
+			"Email address that the receipt for the resulting payment will be sent to."
+		)
+	)
+
+	# source
+
+	statement_descriptor = models.CharField(
+		max_length=255,
+		help_text=(
+			"Extra information about a PaymentIntent. This will appear on your customer’s "
+			"statement when this PaymentIntent succeeds in creating a charge."
+		)
+	)
+
+	status = models.CharField(
+		max_length=255,
+		help_text=(
+			"Status of this PaymentIntent, one of requires_payment_method, requires_confirmation, "
+			"requires_action, processing, requires_capture, canceled, or succeeded. "
+			"You can read more about PaymentIntent statuses here."
+		)
+	)
+
+	transfer_data = JSONField(
+		help_text=(
+			"The data with which to automatically create a Transfer when the payment is finalized. "
+			"See the PaymentIntents Connect usage guide for details."
+		)
+	)
+
+	transfer_group = models.CharField(
+		max_length=255,
+		help_text=(
+			"A string that identifies the resulting payment as part of a group. See the "
+			"PaymentIntents Connect usage guide for details."
+		)
+	)
+
+
 class Customer(StripeModel):
 	"""
 	Customer objects allow you to perform recurring charges and track multiple
